@@ -140,7 +140,8 @@ C.........  Get file format for files listed in day-specific list file
             NAMTMP = LSTSTR( IFIL )
 
 C.............  If line is LIST header, skip to next line
-            IF( INDEX( NAMTMP, 'LIST' ) > 0 ) CYCLE
+            IF( INDEX( NAMTMP, 'LIST' ) > 0 .AND.
+     &          LEN_TRIM( NAMTMP ) < 30 ) CYCLE
 
 C.............  Open files, and report status
             IDEV = JUNIT()

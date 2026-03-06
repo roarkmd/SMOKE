@@ -638,7 +638,8 @@ C.........  Assign bins to output records based on sorting array
 C.........  NOTE:  sequential dependency for B
 
         NBINS( 0 ) = 0
-        LBUF = BLANK
+C        LBUF = ' ' 
+        LBUF = '!'   !! Modified by Huy Tran UNC-IE: Changed initialization from space to '!' to ensure the first record always triggers a new bin assignment (B = B + 1).
         B    = 0
 
         IF( RPT_%USEGMAT ) THEN     !!  construct cumulative-count incidence matrices:
@@ -937,7 +938,12 @@ C.........  Populate the bin characteristic arrays (not the data array)
                 COL = STKX( J )
             END IF
             S    = OUTSRC( J )
-            CFIP =  CIFIP( S )
+C            CFIP =  CIFIP( S )
+            IF ( ASSOCIATED( CIFIP ) ) THEN  !! Modified by Huy Tran UNC-IE: Added check using ASSOCIATED (pointer) to prevent segfault when CIFIP is not allocated
+               CFIP =  CIFIP( S )
+            ELSE
+               CFIP = '000000'
+            END IF
             SCC  =   CSCC( S )
 
             IF( RPT_%BYSRC )     BINSMKID( B )  = S

@@ -173,6 +173,12 @@ C               ending time.
             ELSE IF( I .LE. 0 ) THEN
                 IF( .NOT. RPT_%BYHOUR ) RPTNSTEP = NSTEPS + I / 3600
 
+C.............  For BY HOUR reports, RPTNSTEP must always be set to NSTEPS.
+C               Without this, RPTNSTEP stays 0 (module default) when G_RUNLEN
+C               exactly equals the file duration, causing genrprt.f to loop 0
+C               times and produce an empty report. Fix: Huy Tran UNC-IE 2026-02.
+                IF( RPT_%BYHOUR ) RPTNSTEP = NSTEPS
+
             END IF
 
 C.............  Print message if time steps have changed

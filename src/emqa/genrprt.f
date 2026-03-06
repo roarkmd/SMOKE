@@ -626,7 +626,8 @@ C           Skipped hourly output at line 464 and sum hourly emissions for daily
             DO L = 1, LOUT
                 BINDATA = 0   ! array (summing layered hourly emissions)
 
-                DO T = 1, RPTNSTEP-1
+C               DO T = 1, RPTNSTEP-1
+                DO T = 1, MIN( 24, RPTNSTEP )  !! Modified by Huy Tran UNC-IE: Use MIN(24, RPTNSTEP) to sum available hours for runs <25 steps.
 
                     DO J = 1, NDATA
 

@@ -91,6 +91,8 @@ C.........  Open SSUP speciation supplemental file
         IREC   = 0
         NSPFRC = 0
         NGSPRO = 0
+        S      = 0  !! Added by Huy Tran UNC-IE: Initialize source counter
+        V      = 0  !! Added by Huy Tran UNC-IE: Initialize pollutant index
 
         DO  I = 1, N
 
@@ -112,11 +114,15 @@ C               reset source counter to 0.
             IF ( L1 .GT. 0 ) THEN
 
                 L2 = LEN_TRIM( LINE )     ! Find end quote
-                CBUF = LINE( L1+1:L2-1 )
+                CBUF = TRIM( ADJUSTL( LINE( L1+1:L2-1 ) ) ) !! Modified by Huy Tran UNC-IE: Use TRIM/ADJUSTL for robust matching
 
 C.................  Check if this pollutant is one selected for reporting
                 V = INDEX1( CBUF, NSPCPOL, SPCPOL )
-                IF ( V .GT. 0 ) LSPCPOL( V ) = .TRUE.
+                IF ( V .GT. 0 ) THEN
+                    LSPCPOL( V ) = .TRUE.
+                    S = 0  !! Added by Huy Tran UNC-IE: Reset source counter for each pollutant
+C                         !! to ensure memory allocation (NSPFRC) matches the second pass.
+                END IF
 
 C.............  If not pollutant name, then continue to read in the
 C                   pollutant codes and store them by source
@@ -144,7 +150,8 @@ C.....................  Count the unique list of GSPRO
 C               IF( S .EQ. NSRC ) V = 0
 C  UNC-IE Dec 2023: Replace the above line with the line below this comment which allow
 C                   this subroutine check the last line in A|PSSUP file
-                IF( S == NSRC+1 ) V = 0
+C                IF( S == NSRC+1 ) V = 0
+                IF( S >= NSRC ) V = 0 !! Modified by Huy Tran UNC-IE: Use >= NSRC to prevent buffer overflow
 
             END IF
 
@@ -158,6 +165,8 @@ C                   this subroutine check the last line in A|PSSUP file
      &            SPFRAC( NSPFRC ),
      &            GSPROID( NGSPRO ), STAT = IOS )
         CALL CHECKMEM( IOS, 'SPPNLO...SPFRAC', PNAME )
+        SPPNLO = 1   !! Added by Huy Tran UNC-IE: Zero-initialize arrays to prevent 
+        SPPNHI = 0   !! garbage data/negative index errors in selectsrc.f
         SPFRAC = 1.0
         GSPROID = ''
 
@@ -190,7 +199,7 @@ C               reset source counter to 0.
             IF ( L1 .GT. 0 ) THEN
 
                 L2 = LEN_TRIM( LINE )     ! Find end quote
-                CBUF = LINE( L1+1:L2-1 )
+                CBUF = TRIM( ADJUSTL( LINE( L1+1:L2-1 ) ) ) !! Modified by Huy Tran UNC-IE: Use TRIM/ADJUSTL for robust matching
 
 C.................  Check if this pollutant is one selected for reporting
                 V = INDEX1( CBUF, NSPCPOL, SPCPOL )
@@ -207,9 +216,11 @@ C                   pollutant codes and store them by source
                 N2 = N1 + LEN( 'NFRAC=' )
                 READ( LINE(N2: ), *, IOSTAT=IS1 ) PCNT
                 IF( N1 > 0 ) THEN
-                    S = S + 1
-                    SPPNLO( S ) = M + 1
-                    SPPNHI( S ) = M + PCNT
+                    IF ( S < NSRC ) THEN !! Modified by Huy Tran UNC-IE: Added proactive bounds check before write
+                        S = S + 1
+                        SPPNLO( S ) = M + 1
+                        SPPNHI( S ) = M + PCNT
+                    END IF
                     M = M + PCNT
 
                 ELSE
@@ -225,7 +236,7 @@ C.....................  Develop the unique list of GSPRO
 
                 END IF
 
-                IF( S == NSRC+1 ) V = 0
+                IF( S >= NSRC ) V = 0 !! Modified by Huy Tran UNC-IE: Use >= NSRC to prevent buffer overflow
 
             END IF
 

@@ -70,7 +70,7 @@ C              passed via module MODSPRO)
 
         INTEGER     , INTENT  (IN) :: FDEV            ! file unit number
         INTEGER     , INTENT  (IN) :: NIPOL           ! number of pollutants
-        CHARACTER(IOVLEN3), INTENT  (IN) :: EINAM( NIPOL )  ! pollutant names
+        CHARACTER(*), INTENT  (IN) :: EINAM( NIPOL )  ! pollutant names
 
 C.........  Local parameters
         INTEGER, PARAMETER :: MXSEG = 6        ! # of potential line segments

@@ -22,6 +22,7 @@ C
 C  REVISION  HISTORY:
 C     Created 7/2000 by M. Houyoux
 C     Revised 7/2003 by A. Holland
+C     Revised 3/2026 by H. Tran: Added support for SMK_SOURCE environment variable
 C
 C***********************************************************************
 C  
@@ -137,6 +138,44 @@ C.........  Initialize for start of file
             RPT_%USELABEL = .FALSE.  ! default to not use a label in report
 
             FIRSTIME = .FALSE.
+ 
+C.............  Try to get SMK_SOURCE from environment if not yet set
+            IF ( .NOT. LCATSET ) THEN
+                CALL ENVSTR( 'SMK_SOURCE', ' ', ' ', ENVBUF, IOS )
+                IF ( IOS .EQ. 0 ) THEN
+                    LCATSET = .TRUE.
+                    CALL UPCASE( ENVBUF )
+                    ENVBUF = ADJUSTL( ENVBUF )
+                    IF( ENVBUF( 1:1 ) .EQ. 'A' ) THEN        ! area
+                        MINC     = 3
+                        CRL      = 'A'
+                        CATEGORY = 'AREA'
+                        CATDESC  = 'Area'
+ 
+                    ELSE IF( ENVBUF( 1:1 ) .EQ. 'M' ) THEN   ! mobile
+                        MINC     = 2
+                        CRL      = 'M'
+                        CATEGORY = 'MOBILE'
+                        CATDESC  = 'Mobile'
+ 
+                    ELSE IF( ENVBUF( 1:1 ) .EQ. 'P' ) THEN   ! point
+                        MINC     = 2
+                        CRL      = 'P'
+                        CATEGORY = 'POINT'
+                        CATDESC  = 'Point'
+ 
+                    ELSE
+                        LCATSET = .FALSE.
+                    END IF
+ 
+                    IF( LCATSET ) THEN
+                        WRITE( MESG, 94010 ) 'NOTE: Source category ' //
+     &                    'set from SMK_SOURCE environment variable: ' //
+     &                    TRIM( CATDESC )
+                        CALL M3MSG2( MESG )
+                    END IF
+                END IF
+            END IF
 
         END IF
 

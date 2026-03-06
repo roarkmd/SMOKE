@@ -202,10 +202,12 @@ C                   making sure they line up based on the cell sizes
                 IF( DABS( CHK_X ) > 0.001D0  .OR.
      &              DABS( CHK_Y ) > 0.001D0       ) THEN
                     SFLAG = .TRUE.
-                    MESG = 'ERROR: Grid origins not compatible ' //
-     &                     'between ' // DATDESC // ' in ' // 
-     &                     CRLF() // BLANK10 // FILDESC( 1:L ) // 
-     &                     ' and initialized values.'
+                    WRITE( MESG, 94020 ) 
+     &               'ERROR: Grid origins not compatible between ' // 
+     &               TRIM( DATDESC ) // ' in ' // CRLF() // BLANK10 // 
+     &               TRIM( FILDESC( 1:L ) ) // 
+     &               ' and initialized values.',
+     &               'X-offset:', CHK_X, 'Y-offset:', CHK_Y
                     CALL M3MSG2( MESG ) 
 
                 END IF
@@ -341,6 +343,7 @@ C...........   Formatted file I/O formats............ 93xxx
 C...........   Internal buffering formats............ 94xxx
 
 94010   FORMAT( 10( A, :, I8, :, 1X ) )
+94020   FORMAT( A, 2( 1X, A, F10.5 ) )
 
         END
 

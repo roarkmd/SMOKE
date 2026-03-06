@@ -169,7 +169,10 @@ C.................  Keep a count of the number of selected sources
 C.........  Now create compressed list of sources, but leave INDEXA as is 
 C           for use by REPMRGGRD
 
-        IF( PSFLAG ) THEN
+C        IF( PSFLAG ) THEN
+        IF( RPT_%BYSPC ) THEN  !! Modified by Huy Tran UNC-IE: Use report-specific flag.
+C                              !! Non-speciated (inventory) reports should not expand sources 
+C                              !! to species records, preventing crashes when ASSUP data is missing.
             NOUTREC = 0
             DO S = 1, NSRC
 
@@ -199,7 +202,8 @@ C           for use by REPMRGGRD
 C.........  Now create compressed list of sources, but leave INDEXA as is 
 C           for use by REPMRGGRD
 
-        IF( PSFLAG ) THEN
+C        IF( PSFLAG ) THEN
+        IF( RPT_%BYSPC ) THEN  !! Modified by Huy Tran UNC-IE: Consistent use of report-specific flag.
 
             J = 0            
             DO S = 1, NSRC

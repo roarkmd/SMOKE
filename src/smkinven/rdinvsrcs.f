@@ -321,7 +321,8 @@ C.........  If file is list format, open first file
             LINE = LSTSTR( CURFIL )
                 
 C.............  Skip #LIST lines (must be first)
-            IF( INDEX( LINE, 'LIST' ) > 0 ) THEN
+            IF( INDEX( LINE, 'LIST' ) > 0 .AND.
+     &          LEN_TRIM( LINE ) < 30 ) THEN
                 CURFIL = CURFIL + 1
                 LINE = LSTSTR( CURFIL )
             END IF
@@ -422,7 +423,8 @@ C.......................  Check if there are more files to read
                           LINE = LSTSTR( CURFIL )
 
 C...........................  Check for #LIST line
-                          IF( INDEX( LINE, 'LIST' ) > 0 ) THEN
+                          IF( INDEX( LINE, 'LIST' ) > 0 .AND.
+     &                        LEN_TRIM( LINE ) < 30 ) THEN
                               CURFIL = CURFIL + 1  ! move to next file in list
                           END IF
 

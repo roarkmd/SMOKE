@@ -196,7 +196,8 @@ C.........  Get the number of lines in the input file
             NAMTMP = LSTSTR( IFIL )
 
 C.............  If line is LIST header, skip to next line
-            IF( INDEX( NAMTMP, 'LIST' ) > 0 ) CYCLE
+            IF( INDEX( NAMTMP, 'LIST' ) > 0 .AND.
+     &          LEN_TRIM( NAMTMP ) < 30 ) CYCLE
 
 C.............  If line contains the range of dates, read this packet and
 C               skip to next line

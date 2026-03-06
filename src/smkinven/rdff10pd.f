@@ -443,7 +443,11 @@ C.............  Set the number of fields, depending on day- or hour-specific
             IF( DAYFLAG ) THEN
                 NFIELD  = MON_DAYS( MONTH ) ! Get number of days in the month; defined in inc/EMCNST3.EXT; e.g., NFIELD = 31 for Jan 2020
                 LYEAR =  INT( 1 / YR2DAY( YEAR ) )   ! convert year to days by I/O API YR2DAY; e.g., leaf year YR2DAY( 1980 )	=  1.0 / 366.0
-                IF( LYEAR > 365 .AND. INV_MON .EQ. 2 ) NFIELD = 29 ! Fix issue 135
+                IF( LYEAR > 365 ) THEN
+                    IF ( MONTH .EQ. 2 .OR. INV_MON .EQ. 2 ) THEN
+                        NFIELD = 29 ! Fix issue 135
+                    END IF
+                END IF
                 FSTLOC = 1
                 LSTLOC = NFIELD
             ELSE
@@ -456,7 +460,11 @@ C.............  Skip non-processing month/day
             IF( INV_MON > 0 ) THEN
                 NDAYS  = MON_DAYS( INV_MON )
                 LYEAR =  INT( 1 / YR2DAY( B_YEAR ) )   ! convert year to days
-                IF( LYEAR > 365 .AND. INV_MON .EQ. 2 ) NDAYS = 29 ! Fix issue 135
+                IF( LYEAR > 365 ) THEN
+                    IF ( MONTH .EQ. 2 .OR. INV_MON .EQ. 2 ) THEN
+                        NDAYS = 29 ! Fix issue 135
+                    END IF
+                END IF
                 FSTDATE = 1000 * B_YEAR + JULIAN( B_YEAR, INV_MON, 1 ) 
                 TMNPTR = MIN( TMNPTR, SECSDIFF( RDATE, RTIME, FSTDATE, JTIME ) / TDIVIDE + 1 ) ! Fix issue 136
                 LSTDATE = 1000 * B_YEAR + JULIAN( B_YEAR, INV_MON, NDAYS )
@@ -471,7 +479,7 @@ C.............  Skip non-processing month/day
                     N = MON_DAYS( MONTH )
                     CALL NEXTIME( FSTPRV, JTIME, -240000 * (N-1) )
 
-                    IF( .NOT. ( FSTPRV <= JDATE .AND. JDATE <= LSTDATE ) ) CYCLE ! UNC-IE 12/10/2025: Skipping processing data earlier to speed up
+C                   IF( .NOT. ( FSTPRV <= JDATE .AND. JDATE <= LSTDATE ) ) CYCLE ! UNC-IE 12/10/2025: Skipping processing data earlier to speed up; however this is broken for Mar
 
                     IF( LSTDATE .EQ. JDATE ) THEN
                         NFIELD = 1
